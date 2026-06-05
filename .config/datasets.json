@@ -1,0 +1,31 @@
+{
+    "_comments": "Configuration registry",
+    "datasets": [
+        {
+            "workspace_id": "FILL_IN_WHEN_CONFIRMED",
+            "workspace_name": "Migrated_Reports",
+            "dateset_id": "DATASET_ID",
+            "dataset_name": "DATASET_NAME",
+            "is_critical": true,
+            "is_active": true    
+        },
+        {
+            "workspace_id": "FILL_IN_WHEN_CONFIRMED",
+            "workspace_name": "Operations_Report",
+            "dateset_id": "DATASET_ID",
+            "dataset_name": "DATASET_NAME",
+            "is_critical": true,
+            "is_active": true
+        }
+    ],
+    "workspaces": [
+        {
+            "_comment": "Auto-discover all datasets within this workspace",
+            "workspace_id": "WORKSPACE_ID",
+            "workspace_name": "WORKSPACE_NAME",
+            "is_critical_default": false,
+            "is_active": false,
+            "exclude_datasets": []
+        }
+    ]
+}
