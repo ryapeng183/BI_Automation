@@ -4,7 +4,7 @@ import msal
 import requests
 
 AUTHORITY_TEMPLATE = "https://login.microsoftonline.com/{tenant_id}"
-SCOPE = ["https:analysis.windows.net/powerbi/api/.default"]
+SCOPE = ["https://analysis.windows.net/powerbi/api/.default"]
 BASE_URL = "https://api.powerbi.com/v1.0/myorg"
 
 def get_token(tenant_id: str, client_id: str, client_secret: str) -> str:
@@ -58,7 +58,7 @@ def main() -> None:
     workspaces = resp.json().get("value", [])
     print("[OK] API call succeeded")
     for ws in workspaces:
-        print(" - {es.get('name')}  ({ws.get('id')})")
+        print(f" - {ws.get('name')}  ({ws.get('id')})")
     if not workspaces:
         print(
             " (none yet- epected if the SP hasn't been added as a member of any workspace) "
