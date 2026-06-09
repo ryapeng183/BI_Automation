@@ -64,9 +64,9 @@ def main() -> None:
             " (none yet- epected if the SP hasn't been added as a member of any workspace) "
         )
 
-    if __name__ == "__main__":
-        try:
-            main()
-        except requests.HTTPError as e:
-            print(f"\n [FAIL] http error")
-            sys.exit(1)
+if __name__ == "__main__":
+    try:
+        main()
+    except requests.HTTPError as e:
+        print(f"\n [FAIL] http error")
+        sys.exit(1)
