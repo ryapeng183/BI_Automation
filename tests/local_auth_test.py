@@ -61,7 +61,7 @@ def main() -> None:
         print(f" - {ws.get('name')}  ({ws.get('id')})")
     if not workspaces:
         print(
-            " (none yet- epected if the SP hasn't been added as a member of any workspace) "
+            " (none yet- expected if the SP hasn't been added as a member of any workspace) "
         )
 
 if __name__ == "__main__":
