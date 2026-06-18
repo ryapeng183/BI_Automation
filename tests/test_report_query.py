@@ -3,6 +3,10 @@ import sys
 import msal
 import requests
 
+# $env:PBI_TENANT_ID=""
+# $env:PBI_CLIENT_ID=""
+# $env:PBI_CLIENT_SECRET=""
+
 AUTHORITY_TEMPLATE = "https://login.microsoftonline.com/{tenant_id}"
 SCOPE = ["https://analysis.windows.net/powerbi/api/.default"]
 BASE_URL = "https://api.powerbi.com/v1.0/myorg"
