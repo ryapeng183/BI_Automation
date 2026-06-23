@@ -158,25 +158,25 @@ BI_Automation/
 │   
 │
 ├── src/
-│   ├── __init__.py/
-│   ├── alerts.py/
-│   ├── api_client.py/
-│   ├── auth.py/
-│   ├── delta_ops.py/
-│   ├── discovery.py/
-│   └── transform.py/
+│   ├── __init__.py
+│   ├── alerts.py
+│   ├── api_client.py
+│   ├── auth.py
+│   ├── delta_ops.py
+│   ├── discovery.py
+│   └── transform.py
 │
 ├── config/
-│   ├── datasets.json/
-│   ├── pipeline_config.json/
-│   └── workflow.json/
+│   ├── datasets.json
+│   ├── pipeline_config.json
+│   └── workflow.json
 │
 ├── output_samples/
 └── tests/
-    ├── local_auth_test.py/
-    ├── rate_limit_probe.py/
-    ├── test_dataset_refresh.py/
-    └── test__report_query.py/
+    ├── local_auth_test.py
+    ├── rate_limit_probe.py
+    ├── test_dataset_refresh.py
+    └── test__report_query.py
 
 ```
 
