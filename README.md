@@ -91,7 +91,7 @@ The project follows a standard **Extract → Transform → Load (ETL)** pipeline
 ## 📊 Example Output Schema
 
 ### `dim_report`
-```sql
+``sql
 report_id
 report_name
 workspace_id
@@ -103,7 +103,7 @@ is_orphan_flag
 ``
 
 ### `fact_refresh_event`
-```sql
+``sql
 refresh_event_id
 dataset_id
 refresh_start_ts
@@ -114,7 +114,7 @@ error_code
 ``
 
 ### `fact_report_usage_day`
-```sql
+``sql
 usage_date
 report_id
 view_count
