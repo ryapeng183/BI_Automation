@@ -28,7 +28,7 @@ def get_token(tenant_id: str, client_id: str, client_secret: str) -> str:
         raise SystemExit(f"\n[FAIL] Token Acquisition Failed:\n{err}\n")
     return result["access_token"]
 
-def extract_rate_limit_headers(headers: requests.structres.CaseInsensitiveDict) -> dict[str, str]:
+def extract_rate_limit_headers(headers: requests.structures.CaseInsensitiveDict) -> dict[str, str]:
     found: dict[str, str] = {}
     for name, value in headers.items():
         low = name.lower()
@@ -37,10 +37,10 @@ def extract_rate_limit_headers(headers: requests.structres.CaseInsensitiveDict) 
     return found
 
 def probe_endpoint(
-        name:str,
-        do_requests: Callable[[], requests.Response],
-        max_requests: int,
-        delay:float
+    name: str,
+    do_requests: Callable[[], requests.Response],
+    max_requests: int,
+    delay: float
 ) -> dict[str, Any]:
     requests_made = 0
     first_429_at: int | None = None
@@ -54,14 +54,15 @@ def probe_endpoint(
         try:
             start = time.perf_counter()
             resp = do_requests()
-            elapsed_ms = (time.perf_counter() - start) *1000.0
+            elapsed_ms = (time.perf_counter() - start) * 1000.0
         except requests.RequestException as e:
+            error = f"RequestException: {e}"
             break
 
-        
         requests_made = i
         latencies_ms.append(round(elapsed_ms, 1))
         statuses.append(resp.status_code)
+
         headers = extract_rate_limit_headers(resp.headers)
 
         if i == 1 and headers:
@@ -74,43 +75,44 @@ def probe_endpoint(
             print(f"request {i}: 429 throttled, Retry-After={retry_after} ({elapsed_ms:.0f} ms)")
             break
 
-        if resp.status_code in (401,403):
-            error = (
-                f"HTTP {resp.status_code} - authenticated but not authorized for this"
-            )
+        if resp.status_code in (401, 403):
+            error = f"HTTP {resp.status_code} - authenticated but not authorized for this endpoint"
             break
 
         if resp.status_code >= 400:
-            error = f"HTTP {resp.status_code}:{resp.text[:200]}"
+            error = f"HTTP {resp.status_code}: {resp.text[:200]}"
             break
 
-        if i == 1 or i%10 == 0:
-            print(f"request {i}: {resp.status.code},  ({elapsed_ms:.0f} ms)")
+        if i == 1 or i % 10 == 0:
+            print(f"request {i}: {resp.status_code}, ({elapsed_ms:.0f} ms)")
 
-        throttled = first_429_at is not None
-        result = {
-            "endpoint": name,
-            "requests_made": requests_made,
-            "throttled": throttled,
-            "first_429_at_request": first_429_at,
-            "retry_after_seconds": retry_after,
-            "rate_limit_headers": rate_limit_headers,
-            "min_latency_ms": min(latencies_ms) if latencies_ms else None,
-            "max_latency_ms": max(latencies_ms) if latencies_ms else None,
-            "avg_latency_ms": round(sum(latencies_ms) / len(latencies_ms), 1) if latencies_ms else None,
-            "status_counts": {str(s): statuses.count(s) or s in sorted(set(statuses))},
-            "error": error
-        }
+        if delay:
+            time.sleep(delay)
 
-        if throttled:
-            print(f"hit the lmit after {first_429_at} requests")
+    throttled = first_429_at is not None
 
-        elif error:
-            print(f"stopped early: {error}")
-        else:
-            print(f"sent {requests_made} requests with no error")
+    result = {
+        "endpoint": name,
+        "requests_made": requests_made,
+        "throttled": throttled,
+        "first_429_at_request": first_429_at,
+        "retry_after_seconds": retry_after,
+        "rate_limit_headers": rate_limit_headers,
+        "min_latency_ms": min(latencies_ms) if latencies_ms else None,
+        "max_latency_ms": max(latencies_ms) if latencies_ms else None,
+        "avg_latency_ms": round(sum(latencies_ms) / len(latencies_ms), 1) if latencies_ms else None,
+        "status_counts": {str(s): statuses.count(s) for s in sorted(set(statuses))},
+        "error": error,
+    }
 
-        return result
+    if throttled:
+        print(f"hit the limit after {first_429_at} requests")
+    elif error:
+        print(f"stopped early: {error}")
+    else:
+        print(f"sent {requests_made} requests with no error")
+
+    return result
     
 def main() -> None:
     parser = argparse.ArgumentParser(description="Power BI API rate-limit probe")
@@ -131,9 +133,11 @@ def main() -> None:
         action="store_true",
         help="Also probe /admin/activityevents (uses the tenant-wide admin quota)"
     )
+    default_output = f"rate_limit_report_{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
+
     parser.add_argument(
         "--output",
-        default="rate_limit_report.json",
+        default=default_output,
         help="Path to write the JSON report"
     )
     args = parser.parse_args()
@@ -191,7 +195,7 @@ def main() -> None:
         eq_url = f"{BASE_URL}/groups/{workspace_id}/datasets/{dataset_id}/executeQueries"
         eq_body = {
             "queries": [{"query": 'EVALUATE ROW("x", 1)'}],
-            "serializerSettings": {"inclueNulls: True"}
+            "serializerSettings": {"includeNulls": True}
         }
         results.append(
             probe_endpoint(
@@ -247,14 +251,15 @@ def main() -> None:
 
     for r in results:
         verdict = (
-            f"throttled after {r['first_429_at_request']} req"
+            f"throttled after {r['first_429_at_request']} req "
             f"(Retry-After={r['retry_after_seconds']}s)"
             if r["throttled"]
             else (r["error"] or f"no 429 in {r['requests_made']} req")
         )
         print(f" - {r['endpoint']}: {verdict}")
-        print("=" * 64)
-        print(f"\nfull report written to: {args.output}\n")
+
+    print("=" * 64)
+    print(f"\nfull report written to: {args.output}\n")
 
 
 if __name__ == "__main__":
